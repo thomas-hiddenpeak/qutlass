@@ -85,8 +85,8 @@ $$
 
 ### Requirements:
 
-- **NVIDIA Blackwell GPU** (Compute capabilities supported: `sm_120a` and `sm_100a`)
-- **Compatible drivers**: CUDA 12.8 or newer
+- **NVIDIA Blackwell GPU** (Compute capabilities supported: `sm_120a`, `sm_110a`, and `sm_100a`)
+- **Compatible drivers**: CUDA 12.8 or newer (CUDA 13.0 required for SM110/Thor AGX)
 
 ### Installation:
 

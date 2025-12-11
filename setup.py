@@ -56,6 +56,8 @@ def get_cuda_arch_flags():
         "-gencode",
         "arch=compute_120a,code=sm_120a",
         "-gencode",
+        "arch=compute_110a,code=sm_110a",
+        "-gencode",
         "arch=compute_100a,code=sm_100a",
         "--expt-relaxed-constexpr",
         "--use_fast_math",

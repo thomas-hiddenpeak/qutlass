@@ -230,6 +230,36 @@ void matmul_host_mxf4_bf16_tn(torch::Tensor& D,
                         ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
                     >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
     }
+#elif TARGET_CUDA_ARCH == 110
+    using ArchTag = cutlass::arch::Sm100;
+    if(m<=16){
+        using MmaTileShape       = Shape<_128,_128,_256>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_128,_256>;
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    } else if(m<=256){
+        using MmaTileShape       = Shape<_256,_128,_256>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_128,_256>;
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    } else {
+        using MmaTileShape       = Shape<_256,_256,_256>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_256,_256>;
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    }
 #elif TARGET_CUDA_ARCH == 120
     using ArchTag = cutlass::arch::Sm120;
     using ClusterShape       = Shape<_1,_1,_1>;
@@ -299,6 +329,36 @@ void matmul_host_nvf4_bf16_tn(torch::Tensor& D,
     } else {
         using MmaTileShape       = Shape<_256,_256,_256>;
         using ClusterShape       = Shape<_2,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_256,_256>;
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue4m3_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    }
+#elif TARGET_CUDA_ARCH == 110
+    using ArchTag = cutlass::arch::Sm100;
+    if(m<=16){
+        using MmaTileShape       = Shape<_128,_128,_256>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_128,_256>;
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue4m3_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    } else if(m<=256){
+        using MmaTileShape       = Shape<_256,_128,_256>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_128,_256>;
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue4m3_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    } else {
+        using MmaTileShape       = Shape<_256,_256,_256>;
+        using ClusterShape       = Shape<_1,_1,_1>;
         using PerSmTileShape_MNK = Shape<_128,_256,_256>;
         runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
                         ArchTag,
@@ -378,6 +438,30 @@ void matmul_host_mxf8_bf16_tn(torch::Tensor& D,
                         ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
                     >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
     }
+#elif TARGET_CUDA_ARCH == 110
+    using ArchTag = cutlass::arch::Sm100;
+
+    if(m<=8192){
+        using MmaTileShape       = Shape<_256,_128,_128>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_128,_128>;
+
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    } else {
+        using MmaTileShape       = Shape<_256,_256,_128>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_256,_128>;
+
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    }
 #elif TARGET_CUDA_ARCH == 120
     using ArchTag = cutlass::arch::Sm120;
 
@@ -430,6 +514,30 @@ void matmul_host_mxf8_bf16_nn(torch::Tensor& D,
     } else {
         using MmaTileShape       = Shape<_256,_256,_128>;
         using ClusterShape       = Shape<_2,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_256,_128>;
+
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    }
+#elif TARGET_CUDA_ARCH == 110
+    using ArchTag = cutlass::arch::Sm100;
+
+    if(m<=8192){
+        using MmaTileShape       = Shape<_256,_128,_128>;
+        using ClusterShape       = Shape<_1,_1,_1>;
+        using PerSmTileShape_MNK = Shape<_128,_128,_128>;
+
+        runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
+                        ArchTag,
+                        ElementA, LayoutATag, AlignmentA,
+                        ElementB, LayoutBTag, AlignmentB>::Gemm, cutlass::float_ue8m0_t
+                    >(D, A, B, A_sf, B_sf, alpha, m, n, k, A.device());
+    } else {
+        using MmaTileShape       = Shape<_256,_256,_128>;
+        using ClusterShape       = Shape<_1,_1,_1>;
         using PerSmTileShape_MNK = Shape<_128,_256,_128>;
 
         runGemm<FpGemm<MmaTileShape, ClusterShape, PerSmTileShape_MNK,
